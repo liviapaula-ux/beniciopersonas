@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Benício - iFood Benefícios</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ifood-red: #ea1d2c;
+  --ifood-red-hover: #c41423;
+  --bg-main: #f7f7f7;
+  --bg-card: #ffffff;
+  --text-main: #3e3e3e;
+  --text-secondary: #717171;
+  --border-light: #eaeaea;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; background: var(--bg-main); color: var(--text-main); line-height: 1.5; }
+
+.app { max-width: 800px; margin: 0 auto; min-height: 100vh; background: var(--bg-main); }
+
+.screen { display: none; padding: 2rem 1.5rem; animation: fadeIn 0.3s ease-in-out; }
+.screen.active { display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.header { text-align: center; margin-bottom: 2.5rem; }
+.logo { font-size: 14px; font-weight: 700; color: var(--ifood-red); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 0.75rem; }
+.header h1 { font-size: 26px; font-weight: 700; margin-bottom: 0.5rem; color: #1a1a1a; }
+.header p { font-size: 16px; color: var(--text-secondary); max-width: 500px; margin: 0 auto; }
+
+/* Personas */
+.persona-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 2rem; }
+.persona-card {
+  background: var(--bg-card); border: 2px solid transparent; border-radius: var(--radius-lg);
+  padding: 1.5rem; cursor: pointer; text-align: center;
+  box-shadow: var(--shadow-sm); transition: all 0.2s ease;
+}
+.persona-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+.persona-card.selected { border-color: var(--ifood-red); background: #fffcfc; }
+
+.avatar { 
+  width: 72px; height: 72px; border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+  font-size: 36px; margin: 0 auto 1rem; box-shadow: var(--shadow-sm); transition: transform 0.2s;
+}
+.persona-card:hover .avatar { transform: scale(1.1) rotate(5deg); }
+.avatar-k { background: #E8F4FD; }
+.avatar-s { background: #E9F5E3; }
+.avatar-r { background: #FEF3E2; }
+.avatar-a { background: #FCEAEF; }
+
+.persona-name { font-size: 18px; font-weight: 600; margin-bottom: 0.25rem; }
+.persona-role { font-size: 13px; font-weight: 500; color: var(--ifood-red); margin-bottom: 0.75rem; }
+.persona-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+/* Buttons */
+.btn-primary {
+  background: var(--ifood-red); color: white; border: none; border-radius: 8px;
+  padding: 0.8rem 2rem; font-size: 16px; font-weight: 600; cursor: pointer;
+  transition: background 0.2s; display: block; margin: 0 auto; width: 100%; max-width: 300px;
+}
+.btn-primary:hover:not(:disabled) { background: var(--ifood-red-hover); }
+.btn-primary:disabled { background: #ffd0d3; cursor: not-allowed; }
+
+.back-btn {
+  background: transparent; border: none; color: var(--text-secondary); font-weight: 500;
+  font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 6px; margin-bottom: 1.5rem;
+  transition: color 0.2s;
+}
+.back-btn:hover { color: var(--ifood-red); }
+
+/* Benefits Grid (Clean Look) */
+.section-title { font-size: 18px; font-weight: 600; margin: 2rem 0 1rem; color: #1a1a1a; }
+.section-title:first-of-type { margin-top: 0; }
+
+.benefit-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
+
+.benefit-card {
+  background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-md);
+  padding: 1.25rem; cursor: pointer; text-align: center; position: relative;
+  box-shadow: var(--shadow-sm); transition: all 0.2s;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 130px;
+}
+.benefit-card:hover { border-color: var(--ifood-red); box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.benefit-card .b-icon { font-size: 28px; margin-bottom: 0.75rem; filter: drop-shadow(0 2px 4px rgba(234,29,44,0.1)); }
+.benefit-card .b-name { font-size: 14px; font-weight: 600; margin-bottom: 0.25rem; }
+.benefit-card .b-sub { font-size: 12px; color: var(--text-secondary); }
+
+/* Badges */
+.badge { position: absolute; top: -8px; right: -8px; font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 20px; box-shadow: var(--shadow-sm); }
+.badge-new { background: var(--ifood-red); color: white; }
+.badge-free { background: #4CAF50; color: white; }
+.badge-disc { background: #FF9800; color: white; }
+
+/* Details Panel */
+.detail-panel {
+  background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-md);
+  padding: 1.5rem; margin-top: 1rem; display: none; box-shadow: var(--shadow-md);
+  grid-column: 1 / -1; /* Ocupa a linha inteira no grid */
+}
+.detail-panel.open { display: block; animation: fadeIn 0.3s; }
+.detail-panel h3 { font-size: 16px; font-weight: 600; margin-bottom: 0.75rem; color: var(--ifood-red); }
+.detail-panel p { font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 1rem; }
+
+.highlight-box {
+  background: #fff8f8; border-left: 4px solid var(--ifood-red); border-radius: 0 8px 8px 0;
+  padding: 1rem; margin-top: 1rem; font-size: 13px; font-weight: 500; color: #5a1015;
+}
+
+.ask-btn {
+  background: transparent; border: 1px solid var(--border-light); color: var(--text-main);
+  border-radius: 8px; padding: 0.6rem 1rem; font-size: 13px; font-weight: 500; cursor: pointer;
+  transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;
+}
+.ask-btn:hover { background: var(--bg-main); border-color: var(--text-secondary); }
+
+/* Banners */
+.novidades-banner {
+  background: #FFF4D6; border-radius: var(--radius-md); padding: 1rem 1.25rem;
+  margin-bottom: 2rem; display: flex; align-items: flex-start; gap: 12px; border: 1px solid #FFE082;
+}
+.novidades-banner .icon { font-size: 20px; }
+.novidades-banner p { font-size: 14px; color: #5C4000; }
+
+.persona-intro {
+  background: var(--bg-card); border-radius: var(--radius-md); padding: 1.25rem;
+  margin-bottom: 1.5rem; display: flex; align-items: center; gap: 16px; border: 1px solid var(--border-light);
+}
+.persona-intro .pi-avatar { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+.persona-intro p { font-size: 14px; color: var(--text-secondary); }
+.persona-intro p strong { color: var(--text-main); font-weight: 600; }
+
+/* Pets */
+.pet-options { display: flex; gap: 16px; justify-content: center; margin-top: 2rem; flex-wrap: wrap; }
+.pet-card {
+  background: var(--bg-card); border: 2px solid transparent; border-radius: var(--radius-lg);
+  padding: 2rem; cursor: pointer; text-align: center; min-width: 180px;
+  box-shadow: var(--shadow-sm); transition: all 0.2s;
+}
+.pet-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+.pet-card.selected { border-color: var(--ifood-red); background: #fffcfc; }
+.pet-card .icon { font-size: 40px; margin-bottom: 1rem; transition: transform 0.2s; }
+.pet-card:hover .icon { transform: scale(1.1); }
+.pet-card p { font-size: 16px; font-weight: 600; }
+.pet-card small { font-size: 13px; color: var(--text-secondary); }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+<div id="screen-persona" class="screen active">
+  <div class="header">
+    <div class="logo">Benício · iFood Benefícios</div>
+    <h1>Oi! Eu sou o Benício 👋</h1>
+    <p>Vou te ajudar a navegar pelo seu pacote de benefícios. Com qual perfil você mais se identifica?</p>
+  </div>
+  <div class="persona-grid">
+    <div class="persona-card" onclick="selectPersona('kael')" id="card-kael">
+      <div class="avatar avatar-k">🧑‍💻</div>
+      <div class="persona-name">Kael</div>
+      <div class="persona-role">Construindo do zero</div>
+      <div class="persona-desc">Chegou há pouco tempo, sem dependentes. Vida intensa e descobrindo o iFood.</div>
+    </div>
+    <div class="persona-card" onclick="selectPersona('sam')" id="card-sam">
+      <div class="avatar avatar-s">🧑‍👧</div>
+      <div class="persona-name">Sam</div>
+      <div class="persona-role">Família e agenda cheia</div>
+      <div class="persona-desc">Cônjuge, talvez filhos. Agenda lotada e zero tempo pra burocracia.</div>
+    </div>
+    <div class="persona-card" onclick="selectPersona('ren')" id="card-ren">
+      <div class="avatar avatar-r">🧑‍🎨</div>
+      <div class="persona-name">Ren</div>
+      <div class="persona-role">Ritmo próprio</div>
+      <div class="persona-desc">Estável. Rituais de equilíbrio bem definidos: academia, comida e descanso.</div>
+    </div>
+    <div class="persona-card" onclick="selectPersona('ale')" id="card-ale">
+      <div class="avatar avatar-a">🧑‍💼</div>
+      <div class="persona-name">Ale</div>
+      <div class="persona-role">Liderança focada</div>
+      <div class="persona-desc">Lidera uma área. Zero paciência pra processo — quer que tudo funcione.</div>
+    </div>
+  </div>
+  <button class="btn-primary" id="btn-next-persona" onclick="goToPet()" disabled>Esse sou eu</button>
+</div>
+
+<div id="screen-pet" class="screen">
+  <button class="back-btn" onclick="goTo('screen-persona')">← Voltar</button>
+  <div class="header">
+    <h1>Você tem pet? 🐾</h1>
+    <p>Temos novidades incríveis nessa eleição para os pais e mães de pet.</p>
+  </div>
+  <div class="pet-options">
+    <div class="pet-card" onclick="selectPet(true)" id="pet-yes">
+      <div class="icon">🐶</div>
+      <p>Tenho pet</p>
+      <small>Quero ver as novidades</small>
+    </div>
+    <div class="pet-card" onclick="selectPet(false)" id="pet-no">
+      <div class="icon">🙅</div>
+      <p>Não tenho</p>
+      <small>Pode pular essa parte</small>
+    </div>
+  </div>
+</div>
+
+<div id="screen-menu" class="screen">
+  <button class="back-btn" onclick="goTo('screen-pet')">← Mudar perfil</button>
+
+  <div id="persona-intro-box" class="persona-intro"></div>
+
+  <div id="novidades-banner" class="novidades-banner">
+    <div class="icon">⭐</div>
+    <p id="novidades-text"></p>
+  </div>
+
+  <div class="section-title">Benefícios Flexíveis</div>
+  <div class="benefit-row" id="flex-benefits"></div>
+
+  <div class="section-title">Benefícios por Adesão</div>
+  <div class="benefit-row" id="adesao-benefits"></div>
+
+  <div id="pet-section" style="display:none">
+    <div class="section-title">🐾 Para o seu Pet</div>
+    <div class="benefit-row" id="pet-benefits"></div>
+  </div>
+
+  <div style="text-align:center; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-light);">
+    <p style="font-size:14px; color: var(--text-secondary); margin-bottom: 1rem;">Ainda ficou com alguma dúvida?</p>
+    <button class="ask-btn" onclick="alert('Funcionalidade de chat em desenvolvimento!')">💬 Falar com o Benício</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+let selectedPersona = null;
+let hasPet = null;
+
+const personas = {
+  kael: {
+    name: 'Kael', avatar: '🧑‍💻', avatarBg: '#E8F4FD',
+    intro: 'Você é o <strong>Kael</strong>. Vou destacar o que você talvez ainda não conheça e pode fazer diferença na sua rotina.',
+    novidades: '<strong>Destaque:</strong> Carteira Flex (novo nome do Reembolso Flex), Stay Previdência com cashback exclusivo, e o Avus Família.'
+  },
+  sam: {
+    name: 'Sam', avatar: '🧑‍👧', avatarBg: '#E9F5E3',
+    intro: 'Você é o <strong>Sam</strong>. Foco nos benefícios que protegem quem você ama, sem burocracia.',
+    novidades: '<strong>Destaque:</strong> Seguro de vida agora cobre assistência funeral para pais, Avus Família e o Leggal.'
+  },
+  ren: {
+    name: 'Ren', avatar: '🧑‍🎨', avatarBg: '#FEF3E2',
+    intro: 'Você é o <strong>Ren</strong>. Separei o que tem fit direto com o seu jeito de viver e seus rituais.',
+    novidades: '<strong>Destaque:</strong> Avus Família, Stay Previdência com isenção de taxa, e benefício Cultura para suas experiências.'
+  },
+  ale: {
+    name: 'Ale', avatar: '🧑‍💼', avatarBg: '#FCEAEF',
+    intro: 'Você é o <strong>Ale</strong>. Foco no que tem valor imediato e caminho claro para você e sua família.',
+    novidades: '<strong>Destaque:</strong> Seguro de vida com cobertura ampliada para pais, Leggal (assessoria jurídica), e Stay Previdência.'
+  }
+};
+
+const flexBenefits = [
+  { icon: '🏥', name: 'Plano de Saúde', sub: 'Bradesco / Unimed', detail: 'saude' },
+  { icon: '🦷', name: 'Plano Odonto', sub: 'Bradesco · 3 opções', detail: 'odonto' },
+  { icon: '🛡️', name: 'Seguro de Vida', sub: 'Cobertura pais', badge: 'novo', detail: 'vida' },
+  { icon: '🍔', name: 'VA / VR', sub: 'iFood Benefícios', detail: 'vavr' },
+  { icon: '💊', name: 'Farmácia', sub: 'Saldo livre', detail: 'farmacia' },
+  { icon: '🎭', name: 'Cultura', sub: 'R$50 fixo mensais', detail: 'cultura' },
+  { icon: '🚗', name: 'Mobilidade', sub: 'Transporte e comb.', detail: 'mobilidade' },
+  { icon: '👛', name: 'Carteira Flex', sub: 'Antigo Reembolso', badge: 'novo', detail: 'carteiraflex' },
+];
+
+const adesaoBenefits = [
+  { icon: '👨‍👩‍👧', name: 'Avus Família', sub: 'Telemedicina 24h', badge: 'novo', detail: 'avus' },
+  { icon: '💰', name: 'Stay Previdência', sub: 'Sem taxa de adesão', badge: 'novo', detail: 'stay' },
+  { icon: '🏋️', name: 'Wellhub', sub: 'Academias e apps', detail: 'wellhub' },
+  { icon: '⚖️', name: 'Leggal', sub: 'Proteção jurídica', detail: 'leggal' },
+  { icon: '🎁', name: 'New Value', sub: 'Clube de descontos', detail: 'newvalue' },
+];
+
+const petBenefits = [
+  { icon: '📱', name: 'Telemedicina Pet', sub: 'Sem limite de uso', badge: 'grátis', detail: 'televet' },
+  { icon: '🐾', name: 'Meu Pet Club', sub: 'Planos com cobertura', badge: 'atenção', detail: 'meupet' },
+];
+
+const details = {
+  saude: { title: 'Plano de Saúde Bradesco', body: 'Plano obrigatório com cobertura nacional. A escolha da operadora é feita só na admissão.', highlight: '💡 Verifique a rede credenciada antes de tomar decisões.' },
+  odonto: { title: 'Plano Odontológico', body: 'Benefício obrigatório com 3 opções. Você pode incluir dependentes — inclusive pais e irmãos.', highlight: '💡 Revise seus dependentes se houver divergência com o plano de saúde.' },
+  vida: { title: 'Seguro de Vida', body: 'O seguro agora inclui assistência funeral ampliada para pais — cobre serviços funerários e translado.', highlight: '⭐ Cobertura nova para pais nesta eleição!' },
+  vavr: { title: 'VA / VR', body: 'Benefício obrigatório mínimo de 810 pontos. Parceiro: iFood Benefícios.', highlight: null },
+  farmacia: { title: 'Farmácia', body: 'Conversão: 1 ponto = R$1,00. Pode ser usado para medicamentos.', highlight: null },
+  cultura: { title: 'Cultura', body: 'Valor fixo de R$50,00. Pode ser usado para cinema, shows, livros e pagamento de streamings.', highlight: '💡 Alocar pontos aqui pode ajudar na fatura da Netflix ou Spotify.' },
+  mobilidade: { title: 'Mobilidade', body: 'Para quem usa aplicativos de transporte em dias específicos.', highlight: null },
+  carteiraflex: { title: 'Carteira Flex', body: 'Renomeado de "Reembolso Flex". Aceita despesas médicas, academia, cursos, etc.', highlight: '⭐ Cobre desde academia até cursos de graduação.' },
+  avus: { title: 'Avus Família', body: 'Plataforma de acesso à saúde para você e dependentes. Telemedicina 24h e descontos.', highlight: '⭐ Útil para quem tem pais sem plano de saúde.' },
+  stay: { title: 'Stay — Previdência', body: 'Previdência por adesão com isenção de taxa de carregamento. Cashback por constância.', highlight: '💰 Cashback na primeira aplicação garantido.' },
+  wellhub: { title: 'Wellhub', body: 'Plataforma de bem-estar com academias e apps de atividade física.', highlight: null },
+  leggal: { title: 'Leggal', body: 'Assistência jurídica especializada para o cotidiano (aluguel, divórcio, consumidor).', highlight: '💡 Acesso a advogado, sem custo, sem burocracia.' },
+  newvalue: { title: 'New Value', body: 'Clube de descontos em cinemas, restaurantes, parceiros.', highlight: '💡 Acesso gratuito. Vale explorar no app.' },
+  televet: { title: 'Meu Pet Telemedicina', body: 'Gratuito. Telemedicina veterinária ilimitada.', highlight: '🐾 Automático para toda a base.' },
+  meupet: { title: 'Meu Pet Club', body: 'Planos pagos de saúde pet. O plano emergencial antigo foi descontinuado.', highlight: '⚠️ Quem estava no Plano Emergencial precisa escolher um novo plano.' }
+};
+
+let openDetail = null;
+
+function selectPersona(p) {
+  selectedPersona = p;
+  document.querySelectorAll('.persona-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('card-' + p).classList.add('selected');
+  document.getElementById('btn-next-persona').disabled = false;
+}
+
+function selectPet(val) {
+  hasPet = val;
+  document.querySelectorAll('.pet-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById(val ? 'pet-yes' : 'pet-no').classList.add('selected');
+  setTimeout(() => buildMenu(), 300);
+}
+
+function goToPet() {
+  if (!selectedPersona) return;
+  goTo('screen-pet');
+}
+
+function goTo(screen) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(screen).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function buildMenu() {
+  const p = personas[selectedPersona];
+
+  const introBox = document.getElementById('persona-intro-box');
+  introBox.innerHTML = `<div class="pi-avatar" style="background:${p.avatarBg};">${p.avatar}</div><p>${p.intro}</p>`;
+
+  document.getElementById('novidades-text').innerHTML = p.novidades;
+
+  renderBenefits('flex-benefits', flexBenefits);
+  renderBenefits('adesao-benefits', adesaoBenefits);
+  renderBenefits('pet-benefits', petBenefits);
+
+  document.getElementById('pet-section').style.display = hasPet ? 'block' : 'none';
+
+  goTo('screen-menu');
+}
+
+function renderBenefits(containerId, list) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  list.forEach(b => {
+    const div = document.createElement('div');
+    div.className = 'benefit-card';
+    div.onclick = () => toggleDetail(b.detail, div, container);
+    
+    let badgeHtml = '';
+    if (b.badge === 'novo') badgeHtml = '<span class="badge badge-new">novo</span>';
+    else if (b.badge === 'grátis') badgeHtml = '<span class="badge badge-free">grátis</span>';
+    else if (b.badge === 'atenção') badgeHtml = '<span class="badge badge-disc">atenção</span>';
+    
+    div.innerHTML = `${badgeHtml}<div class="b-icon">${b.icon}</div><div class="b-name">${b.name}</div><div class="b-sub">${b.sub}</div>`;
+    container.appendChild(div);
+  });
+}
+
+function toggleDetail(id, card, container) {
+  // Remove painel existente
+  const existingPanel = container.querySelector('.detail-panel');
+  if (existingPanel) existingPanel.remove();
+
+  if (openDetail === id) {
+    openDetail = null;
+    return;
+  }
+
+  const d = details[id];
+  if (!d) return;
+
+  const panel = document.createElement('div');
+  panel.className = 'detail-panel open';
+  
+  let highlightHtml = d.highlight ? `<div class="highlight-box">${d.highlight}</div>` : '';
+  
+  panel.innerHTML = `
+    <h3>${d.title}</h3>
+    <p>${d.body}</p>
+    ${highlightHtml}
+  `;
+  
+  // Insere o painel logo após o cartão clicado (lidando com o grid)
+  card.parentNode.insertBefore(panel, card.nextSibling);
+  openDetail = id;
+}
+</script>
+</body>
+</html>
